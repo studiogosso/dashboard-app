@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プロジェクトダッシュボード</title>
+<style>
+  :root {
+    --bg: #0a0a16;
+    --bg-card: #12122a;
+    --bg-card-hover: #1a1a3a;
+    --accent: #6c5ce7;
+    --accent-light: #a29bfe;
+    --text: #e8e8f0;
+    --text-dim: #8888aa;
+    --text-muted: #555570;
+    --border: #2a2a4a;
+    --go: #00b894;
+    --improve: #fdcb6e;
+    --hold: #a29bfe;
+    --skip: #e17055;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --glow: 0 0 20px rgba(108,92,231,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  /* ---- Header ---- */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 20px 0 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+
+  .header h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .last-updated {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .btn-refresh {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-refresh:hover {
+    border-color: var(--accent);
+    color: var(--accent-light);
+    box-shadow: var(--glow);
+  }
+  .btn-refresh.spinning .refresh-icon {
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .refresh-icon {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    transition: transform 0.2s;
+  }
+
+  /* ---- Section ---- */
+  .section-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+    padding-left: 2px;
+  }
+
+  .section { margin-bottom: 28px; }
+
+  /* ---- App Links Grid ---- */
+  .app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  .app-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.25s;
+    cursor: pointer;
+  }
+  .app-card:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent);
+    box-shadow: var(--glow);
+    transform: translateY(-2px);
+  }
+
+  .app-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .app-card .app-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .app-card .app-url {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* ---- Stats Card ---- */
+  .stats-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light), var(--accent));
+  }
+
+  .stats-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .stats-card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .stats-card-title .emoji { font-size: 1.2rem; }
+
+  /* ---- Stat Grid ---- */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 10px 6px;
+    background: rgba(108, 92, 231, 0.06);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(108, 92, 231, 0.1);
+  }
+
+  .stat-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--accent-light);
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* ---- Status Badges ---- */
+  .status-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border: 1px solid;
+  }
+
+  .badge-go {
+    background: rgba(0, 184, 148, 0.12);
+    border-color: rgba(0, 184, 148, 0.3);
+    color: var(--go);
+  }
+  .badge-improve {
+    background: rgba(253, 203, 110, 0.12);
+    border-color: rgba(253, 203, 110, 0.3);
+    color: var(--improve);
+  }
+  .badge-hold {
+    background: rgba(162, 155, 254, 0.12);
+    border-color: rgba(162, 155, 254, 0.3);
+    color: var(--hold);
+  }
+  .badge-skip {
+    background: rgba(225, 112, 85, 0.12);
+    border-color: rgba(225, 112, 85, 0.3);
+    color: var(--skip);
+  }
+
+  .badge .badge-count {
+    font-size: 0.9rem;
+    font-weight: 800;
+  }
+
+  /* ---- Progress Bar ---- */
+  .progress-section { margin-bottom: 14px; }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .progress-bar {
+    height: 8px;
+    background: rgba(108, 92, 231, 0.15);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* ---- Info Row ---- */
+  .info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    padding: 10px 0;
+    border-top: 1px solid rgba(108, 92, 231, 0.1);
+  }
+
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .info-item strong {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .placeholder-note {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: rgba(108, 92, 231, 0.06);
+    border: 1px dashed rgba(108, 92, 231, 0.2);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-top: 10px;
+  }
+
+  /* ---- Notion Tags ---- */
+  .tag-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .tag-cat {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(108, 92, 231, 0.1);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    color: var(--accent-light);
+  }
+
+  .tag-cat .count {
+    opacity: 0.7;
+    margin-left: 4px;
+  }
+
+  /* ---- Recent Activity ---- */
+  .activity-list { list-style: none; }
+
+  .activity-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(108, 92, 231, 0.08);
+    transition: background 0.15s;
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-item:hover { background: rgba(108, 92, 231, 0.04); }
+
+  .activity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-go      { background: var(--go); }
+  .dot-improve { background: var(--improve); }
+  .dot-hold    { background: var(--hold); }
+  .dot-skip    { background: var(--skip); }
+
+  .activity-content { flex: 1; min-width: 0; }
+
+  .activity-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .activity-meta {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    display: flex;
+    gap: 10px;
+    margin-top: 2px;
+  }
+
+  .activity-status {
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .status-go      { color: var(--go); }
+  .status-improve { color: var(--improve); }
+  .status-hold    { color: var(--hold); }
+  .status-skip    { color: var(--skip); }
+
+  /* ---- Settings ---- */
+  .settings-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  .setting-group { margin-bottom: 16px; }
+  .setting-group:last-child { margin-bottom: 0; }
+
+  .setting-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .setting-input-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .setting-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .setting-input:focus { border-color: var(--accent); }
+  .setting-input::placeholder { color: var(--text-muted); }
+
+  .btn-save {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-save:hover { background: var(--accent-light); }
+  .btn-save.saved { background: var(--go); }
+
+  .setting-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* ---- Loading / Error / Empty ---- */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 30px;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(108, 92, 231, 0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  .error-msg {
+    padding: 16px;
+    background: rgba(225, 112, 85, 0.08);
+    border: 1px solid rgba(225, 112, 85, 0.2);
+    border-radius: var(--radius-sm);
+    color: var(--skip);
+    font-size: 0.82rem;
+    text-align: center;
+  }
+
+  .empty-msg {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+  }
+
+  /* ---- Scrollbar ---- */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 480px) {
+    .container { padding: 10px; }
+    .header h1 { font-size: 1.15rem; }
+    .stat-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .stat-number { font-size: 1.4rem; }
+    .app-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ============ Header ============ -->
+  <header class="header">
+    <h1>プロジェクトダッシュボード</h1>
+    <div class="header-meta">
+      <span class="last-updated" id="lastUpdated">未取得</span>
+      <button class="btn-refresh" id="btnRefresh" onclick="refreshAll()">
+        <svg class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10"/><path d="M20.49 15a9 9 0 01-14.85 3.36L1 14"/></svg>
+        更新
+      </button>
+    </div>
+  </header>
+
+  <!-- ============ App Links ============ -->
+  <div class="section">
+    <div class="section-title" style="color:#6c5ce7">&#127760; オンライン（どこからでも）</div>
+    <div class="app-grid">
+      <a class="app-card" href="https://studiogosso.github.io/anime-pitch-app/" target="_blank" rel="noopener">
+        <div class="app-icon" style="background:linear-gradient(135deg,#e17055,#fdcb6e);">&#127916;</div>
+        <div><div class="app-name">Anime Pitch Studio</div><div class="app-url">anime-pitch-app</div></div>
+      </a>
+      <a class="app-card" href="https://studiogosso.github.io/game-ideas-app/" target="_blank" rel="noopener">
+        <div class="app-icon" style="background:linear-gradient(135deg,#00b894,#00cec9);">&#127918;</div>
+        <div><div class="app-name">Game Ideas Reviewer</div><div class="app-url">game-ideas-app</div></div>
+      </a>
+      <a class="app-card" href="https://studiogosso.github.io/tag-manager-app/" target="_blank" rel="noopener">
+        <div class="app-icon" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);">&#127991;&#65039;</div>
+        <div><div class="app-name">Notionタグマネージャー</div><div class="app-url">tag-manager-app</div></div>
+      </a>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title" style="color:#00cec9">&#128421; ローカルサーバー（bat起動）</div>
+    <div class="app-grid">
+      <div class="app-card" style="cursor:default">
+        <div class="app-icon" style="background:linear-gradient(135deg,#e74c5e,#4a90d9);">&#128240;</div>
+        <div><div class="app-name">ニュースハブ</div><div class="app-url">business/news_app/serve_news.bat</div></div>
+      </div>
+      <div class="app-card" style="cursor:default">
+        <div class="app-icon" style="background:linear-gradient(135deg,#7c5cfc,#ec4899);">&#128202;</div>
+        <div><div class="app-name">投資レビューアプリ</div><div class="app-url">business/review_app/serve_review.bat</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title" style="color:#ffd700">&#128196; ローカルファイル（直接開く）</div>
+    <div class="app-grid">
+      <div class="app-card" style="cursor:default">
+        <div class="app-icon" style="background:linear-gradient(135deg,#00f0ff,#6c5ce7);">&#9876;&#65039;</div>
+        <div><div class="app-name">レイヴン・ポータル v14</div><div class="app-url">raven_portal/dev/prototype_v14.html</div></div>
+      </div>
+      <div class="app-card" style="cursor:default">
+        <div class="app-icon" style="background:linear-gradient(135deg,#ff6644,#ffcc44);">&#127918;</div>
+        <div><div class="app-name">ゲームレビューアプリ</div><div class="app-url">raven_portal/dev/review_app.html</div></div>
+      </div>
+      <div class="app-card" style="cursor:default">
+        <div class="app-icon" style="background:linear-gradient(135deg,#ff4444,#ff8844);">&#128481;</div>
+        <div><div class="app-name">マルチプレイヤー</div><div class="app-url">raven_portal/dev/multiplayer/</div></div>
+      </div>
+      <div class="app-card" style="cursor:default">
+        <div class="app-icon" style="background:linear-gradient(135deg,#3b82f6,#10b981);">&#128203;</div>
+        <div><div class="app-name">Dropboxレポート</div><div class="app-url">business/dropbox_report.html</div></div>
+      </div>
+      <div class="app-card" style="cursor:default">
+        <div class="app-icon" style="background:linear-gradient(135deg,#8b5cf6,#a855f7);">&#127795;</div>
+        <div><div class="app-name">タグ構造ビューワー</div><div class="app-url">business/tag_structure.html</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Anime Pitch Stats ============ -->
+  <div class="section">
+    <div class="section-title">Anime Pitch</div>
+    <div class="stats-card" id="animePitchCard">
+      <div class="loading"><div class="spinner"></div>読み込み中...</div>
+    </div>
+  </div>
+
+  <!-- ============ Game Ideas Stats ============ -->
+  <div class="section">
+    <div class="section-title">Game Ideas</div>
+    <div class="stats-card" id="gameIdeasCard">
+      <div class="loading"><div class="spinner"></div>読み込み中...</div>
+    </div>
+  </div>
+
+  <!-- ============ Notion Tags ============ -->
+  <div class="section">
+    <div class="section-title">Notion タグ</div>
+    <div class="stats-card" id="notionCard">
+      <div class="loading"><div class="spinner"></div>読み込み中...</div>
+    </div>
+  </div>
+
+  <!-- ============ Recent Activity ============ -->
+  <div class="section">
+    <div class="section-title">最近のアクティビティ</div>
+    <div class="stats-card" id="activityCard">
+      <div class="loading"><div class="spinner"></div>読み込み中...</div>
+    </div>
+  </div>
+
+  <!-- ============ Settings ============ -->
+  <div class="section">
+    <div class="section-title">設定</div>
+    <div class="settings-card">
+      <div class="setting-group">
+        <label class="setting-label">GitHub Personal Access Token（任意）</label>
+        <div class="setting-input-row">
+          <input type="password" class="setting-input" id="ghTokenInput" placeholder="ghp_xxxxxxxxxxxx">
+          <button class="btn-save" id="btnSaveGh" onclick="saveToken('gh')">保存</button>
+        </div>
+        <div class="setting-hint">公開リポジトリの場合、トークン無しでもアクセス可能です。レートリミット回避に使用。</div>
+      </div>
+      <div class="setting-group">
+        <label class="setting-label">Notion API Token</label>
+        <div class="setting-input-row">
+          <input type="password" class="setting-input" id="notionTokenInput" placeholder="secret_xxxxxxxxxxxx">
+          <button class="btn-save" id="btnSaveNotion" onclick="saveToken('notion')">保存</button>
+        </div>
+        <div class="setting-hint">Cloudflare Worker プロキシ経由でNotionにアクセスします。</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ===========================================================================
+   State
+   =========================================================================== */
+let cachedAnime  = null;
+let cachedGame   = null;
+let cachedNotion = null;
+
+/* ===========================================================================
+   Helpers
+   =========================================================================== */
+function getGhToken()     { return localStorage.getItem('dash_gh_token') || ''; }
+function getNotionToken()  { return localStorage.getItem('dash_notion_token') || ''; }
+
+function ghHeaders() {
+  var h = { 'Accept': 'application/vnd.github.v3+json' };
+  var t = getGhToken();
+  if (t) h['Authorization'] = 'Bearer ' + t;
+  return h;
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatDate(ts) {
+  if (!ts) return '';
+  var d = new Date(ts);
+  if (isNaN(d.getTime())) return String(ts);
+  return d.getFullYear() + '/' +
+    String(d.getMonth() + 1).padStart(2, '0') + '/' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+function setUpdatedTime() {
+  var now = new Date();
+  document.getElementById('lastUpdated').textContent =
+    '最終更新 ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+}
+
+function showLoading(el) {
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>読み込み中...</div>';
+}
+
+function showError(el, msg) {
+  el.innerHTML = '<div class="error-msg">' + esc(msg || '接続エラー') + '</div>';
+}
+
+/* ===========================================================================
+   GitHub fetch - decode Base64 JSON from Contents API
+   =========================================================================== */
+async function fetchGhJson(owner, repo, path) {
+  var url = 'https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + path;
+  var res = await fetch(url, { headers: ghHeaders() });
+  if (!res.ok) throw new Error('GitHub API ' + res.status);
+  var data = await res.json();
+  var raw  = atob(data.content.replace(/\n/g, ''));
+  var bytes = new Uint8Array(raw.length);
+  for (var i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+  var text = new TextDecoder('utf-8').decode(bytes);
+  return JSON.parse(text);
+}
+
+/* ===========================================================================
+   Compute stats (shared for both apps)
+   =========================================================================== */
+function computeStats(userData) {
+  var reviews   = userData.reviews   || {};
+  var likes     = userData.likes     || {};
+  var readItems = userData.readItems || {};
+  var sentIds   = userData.sentIds   || [];
+  var projects  = userData.projects  || {};
+
+  // Unique IDs across all data
+  var allIds = new Set();
+  Object.keys(reviews).forEach(function(id) { allIds.add(id); });
+  Object.keys(likes).forEach(function(id)   { allIds.add(id); });
+  if (Array.isArray(readItems)) {
+    readItems.forEach(function(id) { allIds.add(id); });
+  } else {
+    Object.keys(readItems).forEach(function(id) { allIds.add(id); });
+  }
+
+  var totalProposals = allIds.size;
+  var reviewedCount  = Object.keys(reviews).length;
+
+  var goCount = 0, improveCount = 0, holdCount = 0, skipCount = 0;
+  Object.keys(reviews).forEach(function(id) {
+    var s = (reviews[id].status || '').trim();
+    if (s === 'GO' || s === 'go') goCount++;
+    else if (s === '要改善') improveCount++;
+    else if (s === '保留')   holdCount++;
+    else if (s === '見送り') skipCount++;
+  });
+
+  var likedCount = Array.isArray(likes) ? likes.length : Object.keys(likes).length;
+  var sentCount  = sentIds.length;
+
+  var memoCount = 0;
+  Object.keys(projects).forEach(function(pid) {
+    var proj = projects[pid];
+    if (proj && proj.memos) {
+      memoCount += Array.isArray(proj.memos) ? proj.memos.length : Object.keys(proj.memos).length;
+    }
+    if (proj && proj.memo) memoCount++;
+  });
+
+  var progressPct = totalProposals > 0 ? Math.round((reviewedCount / totalProposals) * 100) : 0;
+
+  return {
+    totalProposals: totalProposals,
+    reviewedCount: reviewedCount,
+    goCount: goCount,
+    improveCount: improveCount,
+    holdCount: holdCount,
+    skipCount: skipCount,
+    likedCount: likedCount,
+    sentCount: sentCount,
+    memoCount: memoCount,
+    progressPct: progressPct,
+    reviews: reviews
+  };
+}
+
+/* ===========================================================================
+   Render stats card
+   =========================================================================== */
+function renderStatsCard(el, stats, appLabel, emoji) {
+  el.innerHTML =
+    '<div class="stats-card-header">' +
+      '<div class="stats-card-title"><span class="emoji">' + emoji + '</span>' + esc(appLabel) + '</div>' +
+    '</div>' +
+
+    '<div class="stat-grid">' +
+      '<div class="stat-item"><div class="stat-number">' + stats.totalProposals + '</div><div class="stat-label">全企画数</div></div>' +
+      '<div class="stat-item"><div class="stat-number">' + stats.reviewedCount  + '</div><div class="stat-label">レビュー済</div></div>' +
+      '<div class="stat-item"><div class="stat-number">' + stats.likedCount     + '</div><div class="stat-label">いいね</div></div>' +
+    '</div>' +
+
+    '<div class="status-row">' +
+      '<span class="badge badge-go"><span class="badge-count">'      + stats.goCount      + '</span> GO</span>' +
+      '<span class="badge badge-improve"><span class="badge-count">' + stats.improveCount + '</span> 要改善</span>' +
+      '<span class="badge badge-hold"><span class="badge-count">'    + stats.holdCount    + '</span> 保留</span>' +
+      '<span class="badge badge-skip"><span class="badge-count">'    + stats.skipCount    + '</span> 見送り</span>' +
+    '</div>' +
+
+    '<div class="progress-section">' +
+      '<div class="progress-label"><span>レビュー進捗</span><span>' + stats.progressPct + '%</span></div>' +
+      '<div class="progress-bar"><div class="progress-fill" style="width:' + stats.progressPct + '%"></div></div>' +
+    '</div>' +
+
+    '<div class="info-row">' +
+      '<div class="info-item">仮組み: <strong>' + stats.sentCount + '</strong> 件</div>' +
+      '<div class="info-item">メモ: <strong>'   + stats.memoCount + '</strong> 件</div>' +
+    '</div>' +
+
+    '<div class="placeholder-note">企画化リクエスト: アプリで確認</div>';
+}
+
+/* ===========================================================================
+   Load Anime Pitch
+   =========================================================================== */
+async function loadAnimePitch() {
+  var el = document.getElementById('animePitchCard');
+  showLoading(el);
+  try {
+    var data = await fetchGhJson('studiogosso', 'anime-pitch-app', 'user-data.json');
+    cachedAnime = data;
+    renderStatsCard(el, computeStats(data), 'Anime Pitch Studio', '\uD83C\uDFAC');
+  } catch (e) {
+    console.error('Anime Pitch fetch error:', e);
+    showError(el, '接続エラー: Anime Pitch データを取得できませんでした');
+  }
+}
+
+/* ===========================================================================
+   Load Game Ideas
+   =========================================================================== */
+async function loadGameIdeas() {
+  var el = document.getElementById('gameIdeasCard');
+  showLoading(el);
+  try {
+    var data = await fetchGhJson('studiogosso', 'game-ideas-app', 'user-data.json');
+    cachedGame = data;
+    renderStatsCard(el, computeStats(data), 'Game Ideas Reviewer', '\uD83C\uDFAE');
+  } catch (e) {
+    console.error('Game Ideas fetch error:', e);
+    showError(el, '接続エラー: Game Ideas データを取得できませんでした');
+  }
+}
+
+/* ===========================================================================
+   Load Notion Tags
+   =========================================================================== */
+async function loadNotion() {
+  var el = document.getElementById('notionCard');
+  showLoading(el);
+  var token = getNotionToken();
+  if (!token) {
+    el.innerHTML = '<div class="empty-msg">Notion APIトークンが設定されていません。<br>下の設定欄にトークンを入力してください。</div>';
+    return;
+  }
+  try {
+    var proxyBase = 'https://notion-proxy.gosso1007.workers.dev/api/notion/v1';
+
+    // Search for Tag database
+    var searchRes = await fetch(proxyBase + '/search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify({ filter: { value: 'database', property: 'object' } })
+    });
+    if (!searchRes.ok) throw new Error('Notion API ' + searchRes.status);
+    var searchData = await searchRes.json();
+
+    var tagDbId = null;
+    (searchData.results || []).forEach(function(db) {
+      if (tagDbId) return;
+      var title = (db.title || []).map(function(t) { return t.plain_text || ''; }).join('');
+      if (/tag|タグ/i.test(title)) tagDbId = db.id;
+    });
+
+    if (!tagDbId) {
+      el.innerHTML = '<div class="empty-msg">Tagデータベースが見つかりませんでした。</div>';
+      cachedNotion = null;
+      return;
+    }
+
+    // Paginate through all Tag pages
+    var allTags = [];
+    var hasMore = true;
+    var startCursor = undefined;
+
+    while (hasMore) {
+      var body = { page_size: 100 };
+      if (startCursor) body.start_cursor = startCursor;
+
+      var queryRes = await fetch(proxyBase + '/databases/' + tagDbId + '/query', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+          'Notion-Version': '2022-06-28'
+        },
+        body: JSON.stringify(body)
+      });
+      if (!queryRes.ok) throw new Error('Notion query ' + queryRes.status);
+      var queryData = await queryRes.json();
+      allTags = allTags.concat(queryData.results || []);
+      hasMore = queryData.has_more || false;
+      startCursor = queryData.next_cursor;
+    }
+
+    cachedNotion = allTags;
+
+    // Count by category
+    var catCounts = {};
+    allTags.forEach(function(page) {
+      var props = page.properties || {};
+      var cat = '';
+      Object.keys(props).forEach(function(key) {
+        if (cat) return;
+        var p = props[key];
+        var isCategory = /categ|カテゴリ|type|種類/i.test(key);
+        if (isCategory && p.type === 'select' && p.select) {
+          cat = p.select.name || '';
+        }
+        if (isCategory && p.type === 'multi_select' && p.multi_select && p.multi_select.length > 0) {
+          cat = p.multi_select.map(function(s) { return s.name; }).join(', ');
+        }
+      });
+      if (!cat) cat = 'その他';
+      catCounts[cat] = (catCounts[cat] || 0) + 1;
+    });
+
+    var sortedCats = Object.entries(catCounts).sort(function(a, b) { return b[1] - a[1]; });
+    var catsHtml = sortedCats.map(function(pair) {
+      return '<span class="tag-cat">' + esc(pair[0]) + '<span class="count">(' + pair[1] + ')</span></span>';
+    }).join('');
+
+    el.innerHTML =
+      '<div class="stats-card-header">' +
+        '<div class="stats-card-title"><span class="emoji">\uD83C\uDFF7\uFE0F</span>Notion タグ</div>' +
+      '</div>' +
+      '<div class="stat-grid">' +
+        '<div class="stat-item"><div class="stat-number">' + allTags.length   + '</div><div class="stat-label">タグ合計</div></div>' +
+        '<div class="stat-item"><div class="stat-number">' + sortedCats.length + '</div><div class="stat-label">カテゴリ数</div></div>' +
+      '</div>' +
+      (catsHtml ? '<div class="tag-categories">' + catsHtml + '</div>' : '');
+
+  } catch (e) {
+    console.error('Notion fetch error:', e);
+    showError(el, '接続エラー: Notion データを取得できませんでした');
+  }
+}
+
+/* ===========================================================================
+   Recent Activity
+   =========================================================================== */
+function renderActivity() {
+  var el = document.getElementById('activityCard');
+  var items = [];
+
+  function extract(data, appLabel) {
+    if (!data) return;
+    var reviews = data.reviews || {};
+    Object.keys(reviews).forEach(function(id) {
+      var r      = reviews[id];
+      var status = (r.status || '').trim();
+      var ts     = r.timestamp || r.date || r.updatedAt || r.reviewedAt || null;
+      var title  = r.title || r.name || id;
+      items.push({ id: id, title: title, status: status, ts: ts, app: appLabel });
+    });
+  }
+
+  extract(cachedAnime, 'Anime Pitch');
+  extract(cachedGame,  'Game Ideas');
+
+  items.sort(function(a, b) {
+    var da = a.ts ? new Date(a.ts).getTime() : 0;
+    var db = b.ts ? new Date(b.ts).getTime() : 0;
+    return db - da;
+  });
+
+  var recent = items.slice(0, 10);
+
+  if (recent.length === 0) {
+    el.innerHTML = '<div class="empty-msg">アクティビティはありません</div>';
+    return;
+  }
+
+  function statusCls(s) {
+    if (s === 'GO' || s === 'go') return 'go';
+    if (s === '要改善') return 'improve';
+    if (s === '保留')   return 'hold';
+    if (s === '見送り') return 'skip';
+    return 'go';
+  }
+
+  var listHtml = recent.map(function(item) {
+    var sc = statusCls(item.status);
+    return '<li class="activity-item">' +
+      '<span class="activity-dot dot-' + sc + '"></span>' +
+      '<div class="activity-content">' +
+        '<div class="activity-title">' + esc(item.title) + '</div>' +
+        '<div class="activity-meta"><span>' + esc(item.app) + '</span><span>' + formatDate(item.ts) + '</span></div>' +
+      '</div>' +
+      '<span class="activity-status status-' + sc + '">' + esc(item.status || '-') + '</span>' +
+    '</li>';
+  }).join('');
+
+  el.innerHTML =
+    '<div class="stats-card-header">' +
+      '<div class="stats-card-title"><span class="emoji">\uD83D\uDD53</span>最近のレビュー</div>' +
+    '</div>' +
+    '<ul class="activity-list">' + listHtml + '</ul>';
+}
+
+/* ===========================================================================
+   Settings
+   =========================================================================== */
+function saveToken(type) {
+  var inputId, btnId, storageKey;
+  if (type === 'gh') {
+    inputId = 'ghTokenInput'; btnId = 'btnSaveGh'; storageKey = 'dash_gh_token';
+  } else {
+    inputId = 'notionTokenInput'; btnId = 'btnSaveNotion'; storageKey = 'dash_notion_token';
+  }
+  var val = document.getElementById(inputId).value.trim();
+  if (val) {
+    localStorage.setItem(storageKey, val);
+  } else {
+    localStorage.removeItem(storageKey);
+  }
+  var btn = document.getElementById(btnId);
+  btn.textContent = '保存済';
+  btn.classList.add('saved');
+  setTimeout(function() { btn.textContent = '保存'; btn.classList.remove('saved'); }, 1500);
+}
+
+function initSettings() {
+  var gh = getGhToken();
+  if (gh) document.getElementById('ghTokenInput').value = gh;
+  var nt = getNotionToken();
+  if (nt) document.getElementById('notionTokenInput').value = nt;
+}
+
+/* ===========================================================================
+   Refresh All
+   =========================================================================== */
+async function refreshAll() {
+  var btn = document.getElementById('btnRefresh');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+
+  try {
+    await Promise.allSettled([
+      loadAnimePitch(),
+      loadGameIdeas(),
+      loadNotion()
+    ]);
+    renderActivity();
+    setUpdatedTime();
+  } finally {
+    btn.classList.remove('spinning');
+    btn.disabled = false;
+  }
+}
+
+/* ===========================================================================
+   Init
+   =========================================================================== */
+document.addEventListener('DOMContentLoaded', function() {
+  initSettings();
+  refreshAll();
+});
+</script>
+</body>
+</html>
