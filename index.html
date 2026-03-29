@@ -556,41 +556,42 @@
   <div class="section">
     <div class="section-title" style="color:#00cec9">&#128421; ローカルサーバー（bat起動）</div>
     <div class="app-grid">
-      <div class="app-card" style="cursor:default">
+      <a class="app-card" href="http://localhost:3459" target="_blank" rel="noopener">
         <div class="app-icon" style="background:linear-gradient(135deg,#e74c5e,#4a90d9);">&#128240;</div>
-        <div><div class="app-name">ニュースハブ</div><div class="app-url">business/news_app/serve_news.bat</div></div>
-      </div>
-      <div class="app-card" style="cursor:default">
+        <div><div class="app-name">ニュースハブ</div><div class="app-url">localhost:3459 / serve_news.bat</div></div>
+      </a>
+      <a class="app-card" href="http://localhost:3462" target="_blank" rel="noopener">
         <div class="app-icon" style="background:linear-gradient(135deg,#7c5cfc,#ec4899);">&#128202;</div>
-        <div><div class="app-name">投資レビューアプリ</div><div class="app-url">business/review_app/serve_review.bat</div></div>
-      </div>
+        <div><div class="app-name">投資レビューアプリ</div><div class="app-url">localhost:3462 / serve_review.bat</div></div>
+      </a>
     </div>
   </div>
   <div class="section">
     <div class="section-title" style="color:#ffd700">&#128196; ローカルファイル（直接開く）</div>
-    <div class="app-grid">
-      <div class="app-card" style="cursor:default">
-        <div class="app-icon" style="background:linear-gradient(135deg,#00f0ff,#6c5ce7);">&#9876;&#65039;</div>
-        <div><div class="app-name">レイヴン・ポータル v14</div><div class="app-url">raven_portal/dev/prototype_v14.html</div></div>
-      </div>
-      <div class="app-card" style="cursor:default">
-        <div class="app-icon" style="background:linear-gradient(135deg,#ff6644,#ffcc44);">&#127918;</div>
-        <div><div class="app-name">ゲームレビューアプリ</div><div class="app-url">raven_portal/dev/review_app.html</div></div>
-      </div>
-      <div class="app-card" style="cursor:default">
-        <div class="app-icon" style="background:linear-gradient(135deg,#ff4444,#ff8844);">&#128481;</div>
-        <div><div class="app-name">マルチプレイヤー</div><div class="app-url">raven_portal/dev/multiplayer/</div></div>
-      </div>
-      <div class="app-card" style="cursor:default">
-        <div class="app-icon" style="background:linear-gradient(135deg,#3b82f6,#10b981);">&#128203;</div>
-        <div><div class="app-name">Dropboxレポート</div><div class="app-url">business/dropbox_report.html</div></div>
-      </div>
-      <div class="app-card" style="cursor:default">
-        <div class="app-icon" style="background:linear-gradient(135deg,#8b5cf6,#a855f7);">&#127795;</div>
-        <div><div class="app-name">タグ構造ビューワー</div><div class="app-url">business/tag_structure.html</div></div>
-      </div>
-    </div>
+    <div class="app-grid" id="localAppGrid"></div>
   </div>
+  <script>
+  // Detect base path for local file links
+  (function(){
+    const grid = document.getElementById('localAppGrid');
+    const isLocal = location.protocol === 'file:';
+    const base = isLocal ? location.href.replace(/business\/dashboard\/index\.html.*$/,'') : '';
+    const apps = [
+      {icon:'&#9876;&#65039;',grad:'#00f0ff,#6c5ce7',name:'レイヴン・ポータル v14',path:'raven_portal/dev/prototype_v14.html'},
+      {icon:'&#127918;',grad:'#ff6644,#ffcc44',name:'ゲームレビューアプリ',path:'raven_portal/dev/review_app.html'},
+      {icon:'&#128481;',grad:'#ff4444,#ff8844',name:'マルチプレイヤー',path:'raven_portal/dev/multiplayer/index.html'},
+      {icon:'&#128203;',grad:'#3b82f6,#10b981',name:'Dropboxレポート',path:'business/dropbox_report.html'},
+      {icon:'&#127795;',grad:'#8b5cf6,#a855f7',name:'タグ構造ビューワー',path:'business/tag_structure.html'},
+    ];
+    grid.innerHTML = apps.map(a => {
+      const href = isLocal ? base + a.path : '#';
+      const click = isLocal ? '' : 'onclick="alert(\'PCのローカルで開いてください: '+a.path+'\')"';
+      return '<a class="app-card" href="'+href+'" target="_blank" '+click+'>'
+        +'<div class="app-icon" style="background:linear-gradient(135deg,'+a.grad+')">'+a.icon+'</div>'
+        +'<div><div class="app-name">'+a.name+'</div><div class="app-url">'+a.path+'</div></div></a>';
+    }).join('');
+  })();
+  </script>
 
   <!-- ============ Anime Pitch Stats ============ -->
   <div class="section">
