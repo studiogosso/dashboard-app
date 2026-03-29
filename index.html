@@ -821,7 +821,7 @@ async function loadAnimePitch() {
     renderStatsCard(el, computeStats(data), 'Anime Pitch Studio', '\uD83C\uDFAC');
   } catch (e) {
     console.error('Anime Pitch fetch error:', e);
-    showError(el, '接続エラー: Anime Pitch データを取得できませんでした');
+    showError(el, 'user-data.json未作成。アプリでGitHub同期を設定するとデータが表示されます');
   }
 }
 
