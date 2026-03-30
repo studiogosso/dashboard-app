@@ -19,6 +19,8 @@
     --improve: #fdcb6e;
     --hold: #a29bfe;
     --skip: #e17055;
+    --bg2: #12122a;
+    --text2: #8888aa;
     --radius: 12px;
     --radius-sm: 8px;
     --shadow: 0 4px 24px rgba(0,0,0,0.4);
@@ -551,6 +553,10 @@
         <div class="app-icon" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);">&#127991;&#65039;</div>
         <div><div class="app-name">Notionタグマネージャー</div><div class="app-url">tag-manager-app</div></div>
       </a>
+      <a class="app-card" href="https://studiogosso.github.io/projects/business/dashboard/" target="_blank" rel="noopener">
+        <div class="app-icon" style="background:linear-gradient(135deg,#a29bfe,#6c5ce7);">&#128202;</div>
+        <div><div class="app-name">プロジェクトダッシュボード</div><div class="app-url">dashboard</div></div>
+      </a>
     </div>
   </div>
   <div class="section">
@@ -592,6 +598,54 @@
     }).join('');
   })();
   </script>
+
+  <!-- ============ Skills / Commands ============ -->
+  <div class="section">
+    <div class="section-title" style="color:#ff8844">&#9889; スキル・コマンド</div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;font-size:0.85rem;line-height:2">
+      <div><code style="background:#2a2a4a;padding:2px 8px;border-radius:4px;color:#ffcc44">/evolve</code> <span style="color:var(--text2)">進化サイクル開始（4チーム分析→批評→実装を全プロジェクトで回し続ける）</span></div>
+      <div><code style="background:#2a2a4a;padding:2px 8px;border-radius:4px;color:#ffcc44">おやすみ</code> <span style="color:var(--text2)">メモリ保存+Notion日報+中断系全部実行</span></div>
+      <div><code style="background:#2a2a4a;padding:2px 8px;border-radius:4px;color:#ffcc44">おはよう</code> <span style="color:var(--text2)">タスク状況+日報+朝やること+おすすめ表示</span></div>
+      <div><code style="background:#2a2a4a;padding:2px 8px;border-radius:4px;color:#ffcc44">回して</code> <span style="color:var(--text2)">進化サイクル開始（/evolveと同じ）</span></div>
+      <div><code style="background:#2a2a4a;padding:2px 8px;border-radius:4px;color:#ffcc44">やめて</code> <span style="color:var(--text2)">進化サイクル停止</span></div>
+      <div><code style="background:#2a2a4a;padding:2px 8px;border-radius:4px;color:#ffcc44">メモリ保存</code> <span style="color:var(--text2)">全メモリを更新</span></div>
+      <div><code style="background:#2a2a4a;padding:2px 8px;border-radius:4px;color:#ffcc44">push</code> <span style="color:var(--text2)">全プロジェクトをGitHub+GitHub Pagesにデプロイ</span></div>
+    </div>
+  </div>
+
+  <!-- ============ Version Tracker ============ -->
+  <div class="section">
+    <div class="section-title" style="color:#44ff88">&#128202; バージョン履歴</div>
+    <div style="display:grid;gap:10px">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px">
+        <div style="font-weight:700;color:#00f0ff;margin-bottom:6px">&#127918; RAVEN REBORN</div>
+        <div style="font-size:0.78rem;color:var(--text2);line-height:1.8">
+          v1.0 MUST8件 → v1.1 Bot性格/地形/デコイ → v1.2 チュートリアル/スクライ/残響 →<br>
+          v1.3 部屋効果/クラス → v1.4 ダメージ数字/旗軌跡/スプリント → v1.5 地形コンボ/崩壊/足跡/墓石 →<br>
+          v1.6 反撃/水雷3x/プレビュー → v1.7 モバイル/ショップ詳細 → <strong style="color:#ffcc44">v1.8 next</strong>
+        </div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px">
+        <div style="font-weight:700;color:#e74c5e;margin-bottom:6px">&#128240; NEWS PULSE</div>
+        <div style="font-size:0.78rem;color:var(--text2);line-height:1.8">
+          v1.0 今日の要点/音声 → v1.1 キーワードアラート/影響度 → v1.2 既読管理/ブックマーク → <strong style="color:#ffcc44">v1.3 next</strong>
+        </div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px">
+        <div style="font-weight:700;color:#4a90d9;margin-bottom:6px">&#127916; PITCH FORGE</div>
+        <div style="font-size:0.78rem;color:var(--text2);line-height:1.8">
+          v1.0 未レビュー/PONO自動/ポテンシャル/比較 → v1.1 キーショートカット/構造化FB/進捗バー →<br>
+          v1.2 INBOXバッジ/比較モバイル/ミニ進捗 → <strong style="color:#ffcc44">v1.3 next</strong>
+        </div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px">
+        <div style="font-weight:700;color:#43b581;margin-bottom:6px">&#127918; GAME FORGE</div>
+        <div style="font-size:0.78rem;color:var(--text2);line-height:1.8">
+          v1.0 カテゴリフィルタ/ステータスバッジ/セクションコメント → v1.1 フィルタ分離/構造化FB/レビュー開始 → <strong style="color:#ffcc44">v1.2 next</strong>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ============ Anime Pitch Stats ============ -->
   <div class="section">
