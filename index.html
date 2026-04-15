@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gosso Studio — Apps Hub</title>
+<style>
+:root{
+  --bg:#05070d; --bg2:#0a0e17; --bg3:#111827; --bg4:#1a2236;
+  --border:#1e2d4a; --text:#e2e8f0; --dim:#4d6080; --dim2:#8fa3c0;
+  --blue:#3b82f6; --indigo:#6366f1; --purple:#a855f7; --pink:#ec4899;
+  --cyan:#06b6d4; --teal:#14b8a6; --green:#10b981; --yellow:#f59e0b;
+  --orange:#f97316; --red:#ef4444;
+  --radius:12px; --radius-lg:20px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:hidden;max-width:100vw}
+body{
+  font-family:Inter,'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);font-size:14px;
+  -webkit-font-smoothing:antialiased;min-height:100vh;
+  background-image:
+    radial-gradient(ellipse at top left, rgba(99,102,241,.15), transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(236,72,153,.1), transparent 50%),
+    radial-gradient(ellipse at center, rgba(59,130,246,.05), transparent 70%);
+  transition: background .3s;
+}
+body.light{
+  --bg:#f5f7fa; --bg2:#ffffff; --bg3:#eef1f6; --bg4:#e2e8f0;
+  --border:#d0d9e4; --text:#1a2236; --dim:#8fa3c0; --dim2:#4d6080;
+  background-image:
+    radial-gradient(ellipse at top left, rgba(99,102,241,.08), transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(236,72,153,.06), transparent 50%);
+}
+body.light .card{background:rgba(255,255,255,.85)}
+body.light .card::after{background:rgba(255,255,255,.95)}
+body.light .filter-btn{background:rgba(255,255,255,.6)}
+body.light .search-box{background:rgba(255,255,255,.6)}
+body.light .bg-orb{opacity:.15}
+
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-20px)}}
+.bg-orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:.3;pointer-events:none;animation:float 20s ease-in-out infinite}
+.orb-1{top:-100px;left:-100px;width:400px;height:400px;background:var(--indigo)}
+.orb-2{bottom:-100px;right:-100px;width:500px;height:500px;background:var(--pink);animation-delay:-10s}
+.orb-3{top:50%;left:50%;width:300px;height:300px;background:var(--cyan);animation-delay:-5s}
+
+.wrap{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:40px 24px 80px}
+
+.hero{text-align:center;padding:60px 0 50px;position:relative}
+.hero-brand{display:inline-block;padding:6px 16px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);border-radius:50px;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--indigo);margin-bottom:20px;text-transform:uppercase}
+.hero h1{font-size:clamp(36px,6vw,72px);font-weight:800;line-height:1.1;margin-bottom:16px;letter-spacing:-.02em;background:linear-gradient(135deg,#fff 0%,var(--indigo) 50%,var(--pink) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero .sub{font-size:clamp(14px,2vw,18px);color:var(--dim2);max-width:600px;margin:0 auto 32px;line-height:1.6}
+.hero-stats{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;margin-top:32px}
+.hero-stat{text-align:center}
+.hero-stat .n{font-size:clamp(28px,4vw,42px);font-weight:800;background:linear-gradient(135deg,var(--indigo),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.hero-stat .l{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-top:6px}
+
+.filters{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;padding:0 8px}
+.filter-btn{padding:10px 20px;border:1px solid var(--border);border-radius:50px;background:rgba(10,14,23,.6);backdrop-filter:blur(10px);color:var(--dim2);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.filter-btn:hover{color:var(--text);border-color:var(--indigo);transform:translateY(-2px)}
+.filter-btn.on{background:linear-gradient(135deg,var(--indigo),var(--purple));border-color:transparent;color:#fff;box-shadow:0 8px 24px rgba(99,102,241,.3)}
+
+/* Search + toolbar */
+.toolbar{display:flex;gap:12px;align-items:center;margin-bottom:24px;padding:0 8px;flex-wrap:wrap;justify-content:center}
+.search-wrap{position:relative;flex:1;max-width:480px;min-width:220px}
+.search-box{width:100%;padding:14px 48px 14px 46px;border:1px solid var(--border);border-radius:50px;background:rgba(10,14,23,.6);backdrop-filter:blur(12px);color:var(--text);font-size:14px;outline:none;transition:all .2s;font-family:inherit}
+.search-box::placeholder{color:var(--dim)}
+.search-box:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.search-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--dim);pointer-events:none;font-size:16px}
+.search-kbd{position:absolute;right:14px;top:50%;transform:translateY(-50%);padding:2px 8px;font-size:10px;color:var(--dim);border:1px solid var(--border);border-radius:4px;background:rgba(255,255,255,.04);font-family:monospace}
+.theme-toggle{width:44px;height:44px;border-radius:50%;border:1px solid var(--border);background:rgba(10,14,23,.6);backdrop-filter:blur(10px);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;color:var(--dim2)}
+.theme-toggle:hover{border-color:var(--indigo);color:var(--text);transform:rotate(20deg)}
+
+/* Star pin */
+.card-star{position:absolute;top:10px;left:10px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--dim);z-index:3;transition:all .2s;backdrop-filter:blur(8px)}
+.card-star:hover{color:var(--yellow);transform:scale(1.1)}
+.card-star.on{color:var(--yellow);background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.4)}
+.card-date{font-size:10px;color:var(--dim);margin-top:-6px;margin-bottom:10px;letter-spacing:.3px}
+.card-uses{position:absolute;top:12px;right:12px;font-size:9px;color:var(--dim);padding:3px 8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:50px;z-index:2}
+.empty-state{text-align:center;padding:60px 20px;color:var(--dim)}
+.empty-state .icon{font-size:48px;margin-bottom:16px;opacity:.5}
+
+.section{margin-bottom:60px}
+.section-head{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding:0 4px}
+.section-icon{font-size:28px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:var(--radius);backdrop-filter:blur(10px)}
+.section-title{flex:1}
+.section-title h2{font-size:22px;font-weight:700;margin-bottom:2px;letter-spacing:-.01em}
+.section-title p{font-size:12px;color:var(--dim)}
+.section-count{padding:6px 14px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:50px;font-size:11px;color:var(--dim2);font-weight:600}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+
+.card{
+  position:relative;display:flex;flex-direction:column;
+  padding:24px;border-radius:var(--radius-lg);
+  background:rgba(17,24,39,.7);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.08);
+  text-decoration:none;color:inherit;
+  transition:all .3s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;cursor:pointer;
+}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--accent1,#6366f1) 0%,var(--accent2,#ec4899) 100%);opacity:0;transition:opacity .3s;z-index:0;border-radius:var(--radius-lg)}
+.card::after{content:'';position:absolute;inset:1px;background:rgba(17,24,39,.95);border-radius:calc(var(--radius-lg) - 1px);z-index:0}
+.card:hover{transform:translateY(-6px);border-color:transparent;box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.1)}
+.card:hover::before{opacity:.6}
+.card-content{position:relative;z-index:1;display:flex;flex-direction:column;height:100%}
+.card-emoji{font-size:32px;margin-bottom:12px;display:inline-block;filter:drop-shadow(0 4px 12px rgba(99,102,241,.4))}
+.card-name{font-size:17px;font-weight:700;margin-bottom:4px;letter-spacing:-.01em}
+.card-version{display:inline-block;font-size:10px;padding:2px 8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:50px;color:var(--dim2);font-weight:600;margin-bottom:10px}
+.card-desc{font-size:12px;color:var(--dim2);line-height:1.5;flex:1;margin-bottom:14px}
+.card-action{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--indigo);font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.card:hover .card-action{color:var(--pink)}
+.card-arrow{display:inline-block;transition:transform .2s}
+.card:hover .card-arrow{transform:translateX(4px)}
+.card.local{opacity:.7}
+.card-badge{position:absolute;top:12px;right:12px;padding:3px 9px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:50px;font-size:9px;color:var(--yellow);font-weight:700;text-transform:uppercase;letter-spacing:1px;z-index:2}
+
+.footer{text-align:center;padding:40px 20px 0;color:var(--dim);font-size:12px}
+.footer a{color:var(--indigo);text-decoration:none}
+
+@media(max-width:640px){
+  .wrap{padding:24px 14px 60px}
+  .hero{padding:40px 0 30px}
+  .hero-stats{gap:20px}
+  .grid{grid-template-columns:1fr;gap:12px}
+  .card{padding:20px}
+  .section-icon{width:48px;height:48px;font-size:24px}
+  .section-title h2{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+<div class="bg-orb orb-3"></div>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="hero-brand">GOSSO STUDIO · v2.1</div>
+    <h1>Creative Tools Hub</h1>
+    <p class="sub">アニメーター/監督/脚本家の個人制作環境。<span id="appCountHero">42</span>本のアプリで仕事と生活を最適化。</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="n" id="statApps">42</div><div class="l">Apps</div></div>
+      <div class="hero-stat"><div class="n" id="statRecent">0</div><div class="l">Updated This Week</div></div>
+      <div class="hero-stat"><div class="n">500</div><div class="l">DUO Sentences</div></div>
+      <div class="hero-stat"><div class="n">301</div><div class="l">Anime Pitches</div></div>
+      <div class="hero-stat"><div class="n">75k</div><div class="l">NAS Folders</div></div>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-box" id="searchBox" placeholder="アプリを検索... (名前・説明・タグ)" autocomplete="off">
+      <span class="search-kbd">/</span>
+    </div>
+    <button class="theme-toggle" id="themeToggle" title="テーマ切替">🌙</button>
+  </div>
+  <div class="filters" id="filters"></div>
+  <div id="sections"></div>
+
+  <div class="footer">
+    <p>Built with Claude Code · <a href="https://github.com/studiogosso/projects" target="_blank">GitHub</a></p>
+  </div>
+</main>
+
+<script>
+// id は お気に入り/使用頻度のキー。lastUpdate は YYYY-MM-DD。tags は検索で使う。
+const APPS = [
+  {id:'duo',cat:'learning',emoji:'📚',name:'DUO Vocab',version:'v2.2',desc:'67セクション710文3127語。3Dフリップ+統計+弱点ドリル+SRS',url:'https://studiogosso.github.io/duo-vocab-app/',c1:'#6366f1',c2:'#a855f7',lastUpdate:'2026-04-09',tags:['vocab','english','learning','srs','stats']},
+  {id:'pitch',cat:'anime',emoji:'🎬',name:'Pitch Forge',version:'v1.8',desc:'アニメ企画管理。311本、全タブバッジ、批評、verdict',url:'https://studiogosso.github.io/anime-pitch-app/',c1:'#f97316',c2:'#ec4899',lastUpdate:'2026-04-09',tags:['anime','pitch','review']},
+  {id:'portfolio',cat:'featured',emoji:'🎨',name:'Portfolio',version:'v2.1 🔒',desc:'ポートフォリオ。Careerタイムライン、パーティクル、カウントアップ、glassmorphism',url:'https://studiogosso.github.io/portfolio-app/',c1:'#a855f7',c2:'#ec4899',lastUpdate:'2026-04-09',tags:['portfolio','works','showcase']},
+  {id:'invoice',cat:'productivity',emoji:'🧾',name:'Invoice',version:'v2.0',desc:'仏請求書。Micro-entrepreneur対応、ステータス管理、通貨選択、値引き、glassmorphism',url:'https://studiogosso.github.io/invoice-app/',c1:'#10b981',c2:'#06b6d4',lastUpdate:'2026-04-09',tags:['invoice','facture','finance','business']},
+  {id:'hobbyhub',cat:'lifestyle',emoji:'🎭',name:'Hobby Hub',version:'v5.1',desc:'映画/ゲーム/音楽/読書統合。グラスモーフィズムUI+クイック追加+Notion+年間サマリー',url:'https://studiogosso.github.io/hobby-hub-app/',c1:'#ec4899',c2:'#a855f7',lastUpdate:'2026-04-09',tags:['hobby','movie','game','music','book','notion']},
+  {id:'tagviewer',cat:'featured',emoji:'🔍',name:'Tag Viewer',version:'v8.7',desc:'NAS 75k フォルダのタグブラウザ。Notion統合、両ソース切替',url:'https://studiogosso.github.io/tag-viewer-app/',c1:'#3b82f6',c2:'#06b6d4',lastUpdate:'2026-04-06',tags:['nas','tags','files','search']},
+  {id:'reviewhub',cat:'featured',emoji:'⭐',name:'Review Hub',version:'v1.0',desc:'開発サイクルごとの成果物を★評価+コメントで個別レビュー',url:'https://studiogosso.github.io/review-hub-app/',c1:'#f59e0b',c2:'#ef4444',lastUpdate:'2026-04-06',tags:['review','feedback','rating']},
+
+  {id:'production',cat:'anime',emoji:'🎞️',name:'Production',version:'v1.0',desc:'アニメ制作工程ダッシュボード',url:'https://studiogosso.github.io/production-app/',c1:'#f97316',c2:'#f59e0b',lastUpdate:'2026-03-31',tags:['anime','production']},
+
+  {id:'raven',cat:'game',emoji:'🎮',name:'RAVEN REBORN',version:'v1.27',desc:'ステルス×デッキビルド×PvP。連鎖圧縮ボーナス',url:'https://studiogosso.github.io/raven-reborn/',c1:'#ef4444',lastUpdate:'2026-04-06',tags:['game','deck','stealth','pvp']},
+  {id:'gameforge',cat:'game',emoji:'🎲',name:'Game Forge',version:'v1.6',desc:'ゲーム企画管理ツール',url:'https://studiogosso.github.io/game-ideas-app/',c1:'#ef4444',c2:'#f97316',lastUpdate:'2026-03-30',tags:['game','ideas']},
+  {id:'dice',cat:'game',emoji:'🎯',name:'賽の迷宮',version:'v1.1',desc:'ダイスロール迷宮探索',url:'https://studiogosso.github.io/dice-labyrinth/',c1:'#ef4444',lastUpdate:'2026-03-25',tags:['game','dice','rogue']},
+  {id:'deckdecay',cat:'game',emoji:'🃏',name:'デッキ・ディケイ',version:'v1.1',desc:'デッキ崩壊型カードゲーム',url:'https://studiogosso.github.io/deck-decay/',c1:'#ef4444',lastUpdate:'2026-03-25',tags:['game','card','deck']},
+  {id:'liar',cat:'game',emoji:'🎭',name:'嘘つき商館',version:'v1.0',desc:'ブラフ交渉ゲーム',url:'https://studiogosso.github.io/liar-bazaar/',c1:'#ef4444',lastUpdate:'2026-03-24',tags:['game','bluff','social']},
+  {id:'impostor',cat:'game',emoji:'🗡️',name:'裏切りの地下迷宮',version:'v1.0',desc:'正体隠匿型ダンジョン',url:'https://studiogosso.github.io/dungeon-impostors/',c1:'#ef4444',lastUpdate:'2026-03-24',tags:['game','dungeon','hidden']},
+  {id:'objection',cat:'game',emoji:'⚖️',name:'異議アリ・ザ・スパイア',version:'v1.0',desc:'法廷バトル×塔登り',url:'https://studiogosso.github.io/objection-spire/',c1:'#ef4444',lastUpdate:'2026-03-24',tags:['game','courtroom','tower']},
+
+  {id:'aichat',cat:'productivity',emoji:'🤖',name:'AI Chat',version:'v2.0',desc:'Claude APIチャット。Glassmorphism UI、ストリーミング、会話検索、エクスポート、コードコピー',url:'https://studiogosso.github.io/ai-chat-app/',c1:'#7c5cfc',c2:'#6246e0',lastUpdate:'2026-04-09',tags:['ai','chat','claude']},
+  {id:'news',cat:'productivity',emoji:'📰',name:'News Pulse',version:'v1.7',desc:'ニュースリーダー、RSS、カテゴリ',url:'https://studiogosso.github.io/news-app/',c1:'#3b82f6',lastUpdate:'2026-03-31',tags:['news','rss']},
+  {id:'people',cat:'productivity',emoji:'👥',name:'People Manager',version:'v5.0',desc:'人脈管理。カスタムタグ、検索ハイライト、統計ダッシュボード、glassmorphism',url:'https://studiogosso.github.io/people-app/',c1:'#a855f7',c2:'#ec4899',lastUpdate:'2026-04-09',tags:['people','crm','contacts']},
+  {id:'tagmgr',cat:'productivity',emoji:'🏷️',name:'Tag Manager',version:'v1.0',desc:'Notionタグ管理',url:'https://studiogosso.github.io/tag-manager-app/',c1:'#6366f1',lastUpdate:'2026-03-29',tags:['notion','tags']},
+  {id:'pomodoro',cat:'productivity',emoji:'🍅',name:'Pomodoro',version:'v2.0',desc:'フォーカスタイマー。設定カスタマイズ、自動開始、ブラウザ通知、キーボードショートカット、glassmorphism',url:'https://studiogosso.github.io/pomodoro-app/',c1:'#ef4444',lastUpdate:'2026-04-09',tags:['timer','focus','productivity']},
+  {id:'habits',cat:'productivity',emoji:'✅',name:'Habits',version:'v2.0',desc:'習慣マネージャー。SVGリング、週間ミニビュー、エクスポート/インポート、glassmorphism',url:'https://studiogosso.github.io/habits-app/',c1:'#10b981',lastUpdate:'2026-04-09',tags:['habits','tracking','productivity']},
+
+  {id:'french',cat:'learning',emoji:'🇫🇷',name:'French',version:'v2.0',desc:'フランス語学習。単語検索、ブックマーク、キーボードショートカット、glassmorphism',url:'https://studiogosso.github.io/french-app/',c1:'#3b82f6',lastUpdate:'2026-04-09',tags:['french','language','learning']},
+  {id:'english',cat:'learning',emoji:'🇬🇧',name:'English',version:'v2.0',desc:'英語ジャーナル。自動保存、ワード目標バー、文法ルール拡張、glassmorphism',url:'https://studiogosso.github.io/english-app/',c1:'#ef4444',lastUpdate:'2026-04-09',tags:['english','language','learning']},
+  {id:'reading',cat:'learning',emoji:'📖',name:'Reading',version:'v2.0',desc:'読書マネージャー。並び替え6種、メモ/ログ削除、開始日/完了日、glassmorphism',url:'https://studiogosso.github.io/reading-app/',c1:'#f59e0b',lastUpdate:'2026-04-09',tags:['reading','book','learning']},
+
+  {id:'worldhistory',cat:'history',emoji:'🌍',name:'World History',version:'v2.0',desc:'世界史。スクロールトップ、ブックマーク一括削除、因果関係ラベル改善、glassmorphism',url:'https://studiogosso.github.io/world-history-app/',c1:'#6366f1',lastUpdate:'2026-04-09',tags:['history','world','culture','learning']},
+  {id:'japanhistory',cat:'history',emoji:'🇯🇵',name:'Japan History',version:'v2.0',desc:'日本史。件数表示、ブックマーク同期修正、キーボードヒント、glassmorphism',url:'https://studiogosso.github.io/japan-history-app/',c1:'#ef4444',lastUpdate:'2026-04-09',tags:['history','japan','culture','learning']},
+  {id:'eurohistory',cat:'history',emoji:'🏰',name:'Europe History',version:'v2.0',desc:'ヨーロッパ史。全文検索、同時代人物、クイズグレード、統計ヘッダー、glassmorphism',url:'https://studiogosso.github.io/europe-history-app/',c1:'#3b82f6',lastUpdate:'2026-04-09',tags:['history','europe','culture','learning']},
+  {id:'arthistory',cat:'history',emoji:'🎨',name:'Art History',version:'v2.0',desc:'絵画史。名画ギャラリーフィルター、統計バナー、キーボードショートカット、glassmorphism',url:'https://studiogosso.github.io/art-history-app/',c1:'#ec4899',lastUpdate:'2026-04-09',tags:['history','art','painting','culture']},
+  {id:'architecture',cat:'history',emoji:'🏛️',name:'Architecture',version:'v2.0',desc:'建築史。統計バー、建造物詳細、クイズリセット、キーボードナビ、glassmorphism',url:'https://studiogosso.github.io/architecture-app/',c1:'#f59e0b',lastUpdate:'2026-04-09',tags:['history','architecture','culture']},
+  {id:'fashion',cat:'history',emoji:'👗',name:'Fashion History',version:'v2.0',desc:'ファッション史。ブランド検索、クイズ解説、正解率表示、glassmorphism',url:'https://studiogosso.github.io/fashion-app/',c1:'#a855f7',lastUpdate:'2026-04-09',tags:['history','fashion','culture']},
+
+  {id:'health',cat:'lifestyle',emoji:'❤️',name:'Health',version:'v2.0',desc:'ヘルストラッカー。カロリー/血圧記録、SVGスコアリング、個別削除、glassmorphism',url:'https://studiogosso.github.io/health-app/',c1:'#ef4444',lastUpdate:'2026-04-09',tags:['health','tracking']},
+  {id:'workout',cat:'lifestyle',emoji:'💪',name:'Workout',version:'v2.0',desc:'ワークアウト。設定画面、エクスポート/インポート、Canvasバグ修正、glassmorphism',url:'https://studiogosso.github.io/workout-app/',c1:'#f97316',lastUpdate:'2026-04-09',tags:['workout','fitness']},
+  {id:'recipe',cat:'lifestyle',emoji:'🍳',name:'Recipe',version:'v2.0',desc:'レシピ&買い物。食材検索、進捗バー、メモ欄、XSS修正、glassmorphism',url:'https://studiogosso.github.io/recipe-app/',c1:'#f59e0b',lastUpdate:'2026-04-09',tags:['recipe','cooking','food']},
+  {id:'music',cat:'lifestyle',emoji:'🎵',name:'Music',version:'v2.0',desc:'ミュージックライブラリ。ジャンルフィルター、月別チャート、AND検索、glassmorphism',url:'https://studiogosso.github.io/music-app/',c1:'#a855f7',lastUpdate:'2026-04-09',tags:['music','library']},
+  {id:'travel',cat:'lifestyle',emoji:'✈️',name:'Travel',version:'v2.0',desc:'トラベルプランナー。カウントダウン、旅メモ、行きたい→旅行昇格、glassmorphism',url:'https://studiogosso.github.io/travel-app/',c1:'#06b6d4',lastUpdate:'2026-04-09',tags:['travel','trip']},
+
+  {id:'invest',cat:'finance',emoji:'💰',name:'Investment Lab',version:'v2.0',desc:'投資ラボ。チャートツールチップ、EUR/JPY換算、設定保存、glassmorphism',url:'https://studiogosso.github.io/investment-app/',c1:'#10b981',c2:'#14b8a6',lastUpdate:'2026-04-09',tags:['invest','portfolio','finance']},
+  {id:'budget',cat:'finance',emoji:'💳',name:'Budget',version:'v2.0',desc:'家計簿。取引編集、検索、インポート、日付グループ、glassmorphism',url:'https://studiogosso.github.io/budget-app/',c1:'#10b981',lastUpdate:'2026-04-09',tags:['budget','money','finance']},
+
+  {id:'dashboard',cat:'meta',emoji:'📊',name:'Dashboard',version:'v2.2',desc:'このページ。26アプリv2.0反映、検索・お気に入り・更新フィード',url:'https://studiogosso.github.io/dashboard-app/',c1:'#6366f1',lastUpdate:'2026-04-09',tags:['dashboard','hub']},
+  {id:'sns',cat:'meta',emoji:'📣',name:'Project SNS',version:'v2.0',desc:'プロジェクトSNS。投稿編集、文字数カウンター、統計カード、glassmorphism',url:'https://studiogosso.github.io/sns-app/',c1:'#ec4899',lastUpdate:'2026-04-09',tags:['sns','activity']},
+  {id:'reviewapp',cat:'meta',emoji:'🗒️',name:'Raven Review',version:'v2.0',desc:'ゲームレビュー・パッチノート',url:'https://studiogosso.github.io/raven-review-app/',c1:'#a855f7',lastUpdate:'2026-04-02',tags:['review','game','raven']},
+  {id:'multiplayer',cat:'meta',emoji:'🎮',name:'Raven Multiplayer',version:'v1.0',desc:'RAVEN REBORN オンライン対戦サーバー (Render)',url:'https://raven-reborn-multiplayer.onrender.com',c1:'#ef4444',c2:'#f97316',lastUpdate:'2026-03-20',tags:['game','multiplayer','raven','server']},
+];
+
+const CATEGORIES = [
+  {id:'all',label:'✨ All'},
+  {id:'featured',label:'⭐ Featured',icon:'⭐',title:'Featured & Recent',desc:'今夜のハイライト'},
+  {id:'anime',label:'🎬 Anime',icon:'🎬',title:'Anime Production',desc:'アニメ制作・企画'},
+  {id:'game',label:'🎮 Games',icon:'🎮',title:'Games',desc:'ゲーム・エンタメ'},
+  {id:'productivity',label:'⚡ Productivity',icon:'⚡',title:'Productivity',desc:'仕事・効率化'},
+  {id:'learning',label:'📚 Learning',icon:'📚',title:'Learning',desc:'学習・言語'},
+  {id:'history',label:'🏛️ History',icon:'🏛️',title:'History & Culture',desc:'歴史・文化・教養'},
+  {id:'lifestyle',label:'🎨 Lifestyle',icon:'🎨',title:'Lifestyle',desc:'生活・趣味'},
+  {id:'finance',label:'💰 Finance',icon:'💰',title:'Finance',desc:'投資・家計'},
+  {id:'meta',label:'🔧 Meta',icon:'🔧',title:'Meta & Tools',desc:'メタツール'},
+];
+
+let currentFilter='all';
+let searchQuery='';
+let favorites = JSON.parse(localStorage.getItem('dash_favorites')||'[]');
+let useCount = JSON.parse(localStorage.getItem('dash_use_count')||'{}');
+
+function saveFavorites(){localStorage.setItem('dash_favorites',JSON.stringify(favorites))}
+function saveUseCount(){localStorage.setItem('dash_use_count',JSON.stringify(useCount))}
+
+// Recent: apps updated within last 14 days
+function isRecent(app){
+  if(!app.lastUpdate) return false;
+  const d = new Date(app.lastUpdate);
+  const diffDays = (Date.now() - d.getTime()) / 86400000;
+  return diffDays <= 14;
+}
+function formatDate(s){
+  if(!s) return '';
+  const d = new Date(s);
+  const now = new Date();
+  const diff = Math.floor((now-d)/86400000);
+  if(diff===0) return 'today';
+  if(diff===1) return 'yesterday';
+  if(diff<7) return diff+'d ago';
+  if(diff<30) return Math.floor(diff/7)+'w ago';
+  if(diff<365) return Math.floor(diff/30)+'mo ago';
+  return Math.floor(diff/365)+'y ago';
+}
+
+function renderFilters(){
+  document.getElementById('filters').innerHTML=CATEGORIES.map(c=>{
+    const count=c.id==='all'?APPS.length:APPS.filter(a=>a.cat===c.id).length;
+    return '<button class="filter-btn '+(currentFilter===c.id?'on':'')+'" onclick="setFilter(\x27'+c.id+'\x27)">'+c.label+' <span style="opacity:.6;font-weight:500">'+count+'</span></button>';
+  }).join('');
+}
+
+function matchesSearch(app,q){
+  if(!q) return true;
+  const qq = q.toLowerCase();
+  return (app.name||'').toLowerCase().includes(qq)
+    || (app.desc||'').toLowerCase().includes(qq)
+    || (app.version||'').toLowerCase().includes(qq)
+    || (app.tags||[]).some(t=>t.toLowerCase().includes(qq));
+}
+
+function renderCard(app){
+  const c1=app.c1||'#6366f1';
+  const c2=app.c2||app.c1||'#a855f7';
+  const isNew=app.version&&app.version.includes('NEW');
+  const isFav=favorites.includes(app.id);
+  const uses=useCount[app.id]||0;
+  let html='<a href="'+app.url+'" target="_blank" class="card '+(app.local?'local':'')+'" data-id="'+app.id+'" onclick="trackClick(\x27'+app.id+'\x27)" style="--accent1:'+c1+';--accent2:'+c2+'">';
+  html+='<button class="card-star '+(isFav?'on':'')+'" onclick="event.preventDefault();event.stopPropagation();toggleFav(\x27'+app.id+'\x27)" title="お気に入り">★</button>';
+  if(uses>0) html+='<span class="card-uses">'+uses+'×</span>';
+  if(isNew && !app.version.includes('v2.1')) html+='<span class="card-badge">NEW</span>';
+  html+='<div class="card-content"><div class="card-emoji">'+app.emoji+'</div><div class="card-name">'+app.name+'</div><div class="card-version">'+app.version+(app.local?' · Local':'')+'</div>';
+  if(app.lastUpdate) html+='<div class="card-date">'+formatDate(app.lastUpdate)+'</div>';
+  html+='<div class="card-desc">'+app.desc+'</div><div class="card-action"><span>Open</span><span class="card-arrow">→</span></div></div></a>';
+  return html;
+}
+
+function renderSections(){
+  const container=document.getElementById('sections');
+  let html='';
+  const filtered = APPS.filter(a=>matchesSearch(a,searchQuery));
+
+  // Empty state
+  if(filtered.length===0){
+    container.innerHTML='<div class="empty-state"><div class="icon">🔍</div><p>「'+searchQuery+'」に一致するアプリが見つかりません</p></div>';
+    return;
+  }
+
+  // Favorites section (only on all filter + no search)
+  if(currentFilter==='all' && !searchQuery && favorites.length>0){
+    const favApps = favorites.map(id=>APPS.find(a=>a.id===id)).filter(Boolean);
+    if(favApps.length){
+      html+='<section class="section"><div class="section-head"><div class="section-icon">⭐</div><div class="section-title"><h2>Favorites</h2><p>ピン留め済み</p></div><span class="section-count">'+favApps.length+' apps</span></div><div class="grid">';
+      favApps.forEach(a=>html+=renderCard(a));
+      html+='</div></section>';
+    }
+  }
+
+  // Recently Updated section (only on all filter + no search)
+  if(currentFilter==='all' && !searchQuery){
+    const recent = filtered.filter(isRecent).sort((a,b)=>(b.lastUpdate||'').localeCompare(a.lastUpdate||''));
+    if(recent.length){
+      html+='<section class="section"><div class="section-head"><div class="section-icon">🔥</div><div class="section-title"><h2>Recently Updated</h2><p>直近2週間で更新されたアプリ</p></div><span class="section-count">'+recent.length+' apps</span></div><div class="grid">';
+      recent.forEach(a=>html+=renderCard(a));
+      html+='</div></section>';
+    }
+  }
+
+  // Category sections
+  const cats = currentFilter==='all'
+    ? CATEGORIES.filter(c=>c.id!=='all')
+    : CATEGORIES.filter(c=>c.id===currentFilter);
+
+  if(searchQuery){
+    // Search mode: flat list
+    html+='<section class="section"><div class="section-head"><div class="section-icon">🔍</div><div class="section-title"><h2>Search Results</h2><p>「'+searchQuery+'」</p></div><span class="section-count">'+filtered.length+' apps</span></div><div class="grid">';
+    filtered.forEach(a=>html+=renderCard(a));
+    html+='</div></section>';
+  } else {
+    cats.forEach(cat=>{
+      const apps=filtered.filter(a=>a.cat===cat.id);
+      if(apps.length===0)return;
+      html+='<section class="section"><div class="section-head"><div class="section-icon">'+cat.icon+'</div><div class="section-title"><h2>'+cat.title+'</h2><p>'+cat.desc+'</p></div><span class="section-count">'+apps.length+' apps</span></div><div class="grid">';
+      apps.forEach(a=>html+=renderCard(a));
+      html+='</div></section>';
+    });
+  }
+  container.innerHTML=html;
+}
+
+function updateHeroStats(){
+  document.getElementById('statApps').textContent = APPS.length;
+  document.getElementById('appCountHero').textContent = APPS.length;
+  const recent = APPS.filter(isRecent).length;
+  document.getElementById('statRecent').textContent = recent;
+}
+
+window.setFilter=function(id){currentFilter=id;renderFilters();renderSections();window.scrollTo({top:document.querySelector('.filters').offsetTop-20,behavior:'smooth'})};
+window.toggleFav=function(id){
+  const i=favorites.indexOf(id);
+  if(i>=0)favorites.splice(i,1);else favorites.push(id);
+  saveFavorites();renderSections();
+};
+window.trackClick=function(id){
+  useCount[id]=(useCount[id]||0)+1;
+  saveUseCount();
+};
+
+// Search
+document.getElementById('searchBox').addEventListener('input',e=>{
+  searchQuery=e.target.value.trim();
+  renderSections();
+});
+
+// Theme toggle
+const savedTheme = localStorage.getItem('dash_theme');
+if(savedTheme==='light') document.body.classList.add('light');
+document.getElementById('themeToggle').textContent = document.body.classList.contains('light')?'☀️':'🌙';
+document.getElementById('themeToggle').addEventListener('click',()=>{
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  localStorage.setItem('dash_theme',isLight?'light':'dark');
+  document.getElementById('themeToggle').textContent = isLight?'☀️':'🌙';
+});
+
+// Keyboard: / to focus search, Esc to clear
+document.addEventListener('keydown',e=>{
+  if(e.key==='/' && document.activeElement.tagName!=='INPUT'){
+    e.preventDefault();
+    document.getElementById('searchBox').focus();
+  }
+  if(e.key==='Escape' && document.activeElement.id==='searchBox'){
+    document.getElementById('searchBox').value='';
+    searchQuery='';
+    document.getElementById('searchBox').blur();
+    renderSections();
+  }
+});
+
+updateHeroStats();
+renderFilters();
+renderSections();
+</script>
+</body>
+</html>
